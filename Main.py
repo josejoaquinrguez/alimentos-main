@@ -42,6 +42,13 @@ def detectar_categoria(nombre):
         "desinfectante", "quitagrasas", "limpiacristales"
     ]
 
+    palabras_higiene = [
+    "champu", "champú", "gel", "jabón", "jabon",
+    "pasta de dientes", "cepillo de dientes",
+    "desodorante", "dentífrico", "dentifrico",
+    "colonia", "acondicionador", "higiene íntima"
+]
+
     for palabra in palabras_bebida:
         if palabra in nombre:
             return "Bebida"
@@ -50,7 +57,12 @@ def detectar_categoria(nombre):
         if palabra in nombre:
             return "Limpieza"
 
+    for palabra in palabras_higiene:
+        if palabra in nombre:
+            return "Higiene"
+
     return None
+
 
 
 def elegir_categoria(producto, categorias):
@@ -76,11 +88,12 @@ def elegir_categoria(producto, categorias):
     print("1. Comida")
     print("2. Bebida")
     print("3. Limpieza")
+    print("4. Higiene")
 
     if propuesta:
         respuesta = input(
             "Pulsa Enter para aceptar la sugerencia "
-            "o escribe 1, 2 o 3 para cambiarla: "
+            "o escribe 1, 2, 3 o 4 para cambiarla: "
         ).strip()
 
         if respuesta == "":
@@ -88,19 +101,22 @@ def elegir_categoria(producto, categorias):
         else:
             categoria = None
     else:
-        respuesta = input("Elige una categoría (1, 2 o 3): ").strip()
+        respuesta = input(
+            "Elige una categoría (1, 2, 3 o 4): "
+        ).strip()
         categoria = None
 
     opciones = {
         "1": "Comida",
         "2": "Bebida",
-        "3": "Limpieza"
+        "3": "Limpieza",
+        "4": "Higiene"
     }
 
     if categoria is None:
         while respuesta not in opciones:
             respuesta = input(
-                "Opción no válida. Elige 1, 2 o 3: "
+                "Opción no válida. Elige 1, 2, 3 o 4: "
             ).strip()
 
         categoria = opciones[respuesta]
@@ -110,6 +126,61 @@ def elegir_categoria(producto, categorias):
 
     print(f"Categoría guardada: {categoria}")
     return categoria
+
+
+def editar_categoria(despensa, categorias):
+    print("\n--- EDITAR CATEGORÍA ---")
+
+    if not despensa:
+        print("La despensa está vacía.")
+        return
+
+    print("Productos disponibles:")
+
+    for producto in despensa:
+        print(f"- {producto}")
+
+    nombre = input("\n¿Qué producto quieres modificar? ").strip()
+
+    producto = buscar_producto(despensa, nombre)
+
+    if producto is None:
+        print("Ese producto no existe en la despensa.")
+        return
+
+    print(f"\nCategoría actual de {producto}:")
+
+    clave_categoria = buscar_producto(categorias, producto)
+
+    if clave_categoria is not None:
+        print(categorias[clave_categoria])
+    else:
+        print("Sin categoría asignada.")
+
+    print("\nElige la nueva categoría:")
+    print("1. Comida")
+    print("2. Bebida")
+    print("3. Limpieza")
+    print("4. Higiene")
+
+    opcion = input("Selecciona una opción: ").strip()
+
+    opciones = {
+        "1": "Comida",
+        "2": "Bebida",
+        "3": "Limpieza",
+        "4": "Higiene"
+    }
+
+    if opcion not in opciones:
+        print("Opción no válida. No se han realizado cambios.")
+        return
+
+    categorias[producto] = opciones[opcion]
+    guardar_categorias(categorias)
+
+    print(f"{producto} ahora pertenece a la categoría {opciones[opcion]}.")
+
 
 
 def cargar_despensa():
@@ -137,8 +208,6 @@ def guardar_lista_compra(lista_compra):
     with open(ARCHIVO_LISTA, "w", encoding="utf-8") as archivo:
         json.dump(lista_compra, archivo, ensure_ascii=False, indent=4)
 
-
-        
 
 
 def anadir_lista_compra(lista_compra):
@@ -170,7 +239,6 @@ def anadir_lista_compra(lista_compra):
 
     guardar_lista_compra(lista_compra)
     print("Producto añadido a la lista de la compra.")
-
 
 
 
@@ -219,8 +287,6 @@ def marcar_comprado(lista_compra, despensa):
 
     print(f"Has añadido {cantidad} unidades de {producto_lista} a la despensa.")
     print("Producto retirado de la lista de la compra.")
-
-
 
 
 
@@ -285,19 +351,54 @@ def productos_reponer(despensa, lista_compra):
 
 
 
-def ver_productos(despensa):
+
+
+def ver_productos(despensa, categorias):
     print("\n--- MI DESPENSA ---")
 
     if not despensa:
         print("La despensa está vacía.")
         return
 
+    orden_categorias = ["Comida", "Bebida", "Limpieza", "Higiene"]
+
+    for categoria in orden_categorias:
+        productos_categoria = []
+
+        for producto, cantidad in despensa.items():
+            clave_categoria = buscar_producto(categorias, producto)
+
+            if clave_categoria is not None:
+                categoria_producto = categorias[clave_categoria]
+
+                if categoria_producto == categoria:
+                    productos_categoria.append((producto, cantidad))
+
+        if productos_categoria:
+            print(f"\n--- {categoria.upper()} ---")
+
+            for producto, cantidad in productos_categoria:
+                print(f"- {producto}: {cantidad}")
+
+    sin_categoria = []
+
     for producto, cantidad in despensa.items():
-        print(f"- {producto}: {cantidad}")
+        clave_categoria = buscar_producto(categorias, producto)
+
+        if clave_categoria is None:
+            sin_categoria.append((producto, cantidad))
+        elif categorias[clave_categoria] not in orden_categorias:
+            sin_categoria.append((producto, cantidad))
+
+    if sin_categoria:
+        print("\n--- SIN CATEGORÍA ---")
+
+        for producto, cantidad in sin_categoria:
+            print(f"- {producto}: {cantidad}")
 
 
 
-def anadir_producto(despensa):
+def anadir_producto(despensa, categorias):
     producto = input("¿Qué producto has comprado? ").strip()
 
     if not producto:
@@ -319,6 +420,8 @@ def anadir_producto(despensa):
         print("La cantidad debe ser mayor que cero.")
         return
 
+    elegir_categoria(producto, categorias)
+
     if producto in despensa:
         despensa[producto] += cantidad
     else:
@@ -326,8 +429,6 @@ def anadir_producto(despensa):
 
     guardar_despensa(despensa)
     print("Compra registrada correctamente.")
-
-
 
 
 def consumir_producto(despensa):
@@ -385,6 +486,7 @@ def eliminar_producto(despensa):
 def main():
     despensa = cargar_despensa()
     lista_compra = cargar_lista_compra()
+    categorias = cargar_categorias()
 
     while True:
         print("\n==============================")
@@ -398,14 +500,15 @@ def main():
         print("6. Ver lista de la compra")
         print("7. Añadir a la lista de la compra")
         print("8. Productos que necesito reponer")
-        print("9. Salir")
+        print("9. Editar categoría")
+        print("10. Salir")
 
         opcion = input("\nElige una opción: ").strip()
 
         if opcion == "1":
-            ver_productos(despensa)
+            ver_productos(despensa, categorias)
         elif opcion == "2":
-            anadir_producto(despensa)
+            anadir_producto(despensa, categorias)
         elif opcion == "3":
             consumir_producto(despensa)
         elif opcion == "4":
@@ -419,12 +522,14 @@ def main():
         elif opcion == "8":
             productos_reponer(despensa, lista_compra)
         elif opcion == "9":
+            editar_categoria(despensa, categorias)
+        elif opcion == "10":
             guardar_despensa(despensa)
             guardar_lista_compra(lista_compra)
             print("Despensa y lista de la compra guardadas. ¡Hasta pronto!")
             break
         else:
-            print("Opción no válida. Elige del 1 al 5.")
+            print("Opción no válida. Elige del 1 al 10.")
 
 
 if __name__ == "__main__":
