@@ -63,8 +63,6 @@ def detectar_categoria(nombre):
 
     return None
 
-
-
 def elegir_categoria(producto, categorias):
     existente = buscar_producto(categorias, producto)
 
@@ -241,7 +239,6 @@ def anadir_lista_compra(lista_compra):
     print("Producto añadido a la lista de la compra.")
 
 
-
 def ver_lista_compra(lista_compra):
     print("\n--- LISTA DE LA COMPRA ---")
 
@@ -251,10 +248,6 @@ def ver_lista_compra(lista_compra):
 
     for producto, cantidad in lista_compra.items():
         print(f"- {producto}: {cantidad} unidades")
-
-
-
-
 
 def marcar_comprado(lista_compra, despensa):
     if not lista_compra:
@@ -287,8 +280,6 @@ def marcar_comprado(lista_compra, despensa):
 
     print(f"Has añadido {cantidad} unidades de {producto_lista} a la despensa.")
     print("Producto retirado de la lista de la compra.")
-
-
 
 def productos_reponer(despensa, lista_compra):
     print("\n--- PRODUCTOS QUE NECESITO REPONER ---")
@@ -348,11 +339,6 @@ def productos_reponer(despensa, lista_compra):
     else:
         print("\nNo se han añadido productos.")
 
-
-
-
-
-
 def ver_productos(despensa, categorias):
     print("\n--- MI DESPENSA ---")
 
@@ -396,8 +382,6 @@ def ver_productos(despensa, categorias):
         for producto, cantidad in sin_categoria:
             print(f"- {producto}: {cantidad}")
 
-
-
 def anadir_producto(despensa, categorias):
     producto = input("¿Qué producto has comprado? ").strip()
 
@@ -429,7 +413,6 @@ def anadir_producto(despensa, categorias):
 
     guardar_despensa(despensa)
     print("Compra registrada correctamente.")
-
 
 def consumir_producto(despensa):
     producto = input("¿Qué producto has consumido? ").strip()
@@ -464,9 +447,6 @@ def consumir_producto(despensa):
 
     guardar_despensa(despensa)
 
-
-
-
 def eliminar_producto(despensa):
     producto = input(
         "¿Qué producto quieres eliminar por completo? "
@@ -480,8 +460,6 @@ def eliminar_producto(despensa):
         print("Producto eliminado correctamente.")
     else:
         print("Ese producto no está en la despensa.")
-
-
 
 def main():
     despensa = cargar_despensa()
